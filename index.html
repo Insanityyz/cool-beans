@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Protected Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1C1C1C;
+            color: #FFFFFF;
+        }
+        .container {
+            text-align: center;
+            background-color: #2E2E2E;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+            width: 100%;
+        }
+        input[type="password"], input[type="submit"] {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #555555;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #3C3C3C;
+            color: #FFFFFF;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #errorMessage, #noLinkMessage, #redirectingMessage {
+            color: #FF6F61;
+            display: none;
+        }
+        #redirectingMessage {
+            color: #4CAF50;
+        }
+        .info {
+            margin-top: 15px;
+            color: #BBBBBB;
+        }
+        .info-small {
+            margin-top: 5px;
+            color: #AAAAAA;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .info-small:hover {
+            text-decoration: underline;
+        }
+        .embed-container {
+            display: none;
+            margin-top: 20px;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Enter A Proxy Password</h2>
+        <form id="passwordForm">
+            <input type="password" id="password" placeholder="Enter proxy password">
+            <input type="submit" value="Submit">
+        </form>
+        <p id="errorMessage">Invalid proxy password. Please try again.</p>
+        <p id="noLinkMessage">Proxy Password doesn't seem valid, try again.</p>
+        <p id="redirectingMessage">Redirecting to <span id="snippet"></span>...</p>
+        <p class="info">To find Proxy Passwords, go to https://discord.gg/HMupsfGSag</p>
+        <p class="info-small" onclick="showEmbed()">Can't use Discord? Try to use an unblocked version of it. (Double Click To Open)</p>
+        <div class="embed-container" id="embedContainer">
+            <iframe id="wB"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('passwordForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const password = btoa(document.getElementById('password').value.trim());
+
+            const jsonLinkBase64 = 'aHR0cHM6Ly9wYXN0ZWJpbi5jb20vcmF3L2t3OXlabG1p';
+            const jsonLink = atob(jsonLinkBase64);
+
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('noLinkMessage').style.display = 'none';
+            document.getElementById('redirectingMessage').style.display = 'none';
+
+            if (password === '') {
+                document.getElementById('errorMessage').textContent = 'Please enter a proxy password.';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            fetch(jsonLink)
+                .then(response => response.json())
+                .then(passwords => {
+                    if (passwords.hasOwnProperty(password)) {
+                        const decodedUrl = atob(passwords[password]);
+                        document.getElementById('snippet').innerText = decodedUrl;
+                        document.getElementById('redirectingMessage').style.display = 'block';
+
+                        setTimeout(() => {
+                            window.location.href = decodedUrl;
+                        }, 2500);
+                    } else {
+                        document.getElementById('noLinkMessage').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching the JSON:', error);
+                    document.getElementById('errorMessage').textContent = 'Failed to verify password. Try again later.';
+                    document.getElementById('errorMessage').style.display = 'block';
+                });
+        });
+
+        function showEmbed() {
+            const embedContainer = document.getElementById('embedContainer');
+            const wbl = 'aHR0cHM6Ly9lLndpZGdldGJvdC5pby9jaGFubmVscy8xMjcwODY2MDU0NzE2OTg1Mzg0LzEyNzA4NjYwNTQ3MTY5ODUzODc=';
+            document.getElementById('wB').src = atob(wbl);
+            embedContainer.style.display = embedContainer.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
